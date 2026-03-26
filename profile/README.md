@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://gitpump.com/logo.png" alt="GitPump Logo" width="96" height="96" style="border-radius: 20px;" />
+  <img src="https://github.com/git-pump/git-pump.github.io/blob/2af5e3776e32e6dfde3041fcd81d3b86fb96b0d1/logo.png" alt="GitPump Logo" width="96" height="96" style="border-radius: 20px;" />
 
   <h1>GitPump</h1>
 
