@@ -33,6 +33,14 @@ By introducing structure and traceable workflows, GitPump helps:
 
 ---
 
+## Install the Bot
+
+**[→ Install GitPump on your repository](https://github.com/apps/gitpump-bot)**
+
+Once installed, the bot will listen for `/launch` and `/claim` commands in any issue comment on your repo.
+
+---
+
 ## How It Works
 
 A simple GitHub comment becomes a real token launch.
@@ -41,7 +49,7 @@ A simple GitHub comment becomes a real token launch.
 /launch name=YourToken symbol=TICKER description=Your description platform=pumpfun
 ```
 
-1. Open an issue in any repo with GitPump installed
+1. Install GitPump on your repo (see above)
 2. Post a `/launch` command with your token details and attach a logo image
 3. The GitPump bot validates input, uploads your logo to IPFS, and deploys on your chosen platform
 4. Bot replies with the contract address and a direct link
@@ -247,6 +255,7 @@ It's about launching better.
 ---
 
 <div align="center">
+  <a href="https://github.com/apps/gitpump-bot">Install the Bot</a> &nbsp;|&nbsp;
   <a href="https://gitpump.com">gitpump.com</a> &nbsp;|&nbsp;
   <a href="https://github.com/git-pump/gitpump/issues">Launch Now</a>
 </div>
