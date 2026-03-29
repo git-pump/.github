@@ -4,66 +4,56 @@
   <h1>GitPump</h1>
 
   <p>
-    <img src="https://img.shields.io/badge/status-active%20development-brightgreen?style=flat-square" alt="Status" />
-    <img src="https://img.shields.io/badge/platforms-pump.fun%20%7C%20bags.fm%20%7C%20clanker%20%7C%20four.meme-9945FF?style=flat-square" alt="Platforms" />
+    <img src="https://img.shields.io/badge/status-live-brightgreen?style=flat-square" alt="Status" />
+    <img src="https://img.shields.io/badge/Pump.fun-Solana-9945FF?style=flat-square" alt="Pump.fun" />
+    <img src="https://img.shields.io/badge/Bags.fm-Solana-14F195?style=flat-square" alt="Bags.fm" />
+    <img src="https://img.shields.io/badge/Clanker-Base-0052FF?style=flat-square" alt="Clanker" />
+    <img src="https://img.shields.io/badge/Four.meme-BSC-F0B90B?style=flat-square" alt="Four.meme" />
     <img src="https://img.shields.io/badge/powered%20by-GitHub-181717?style=flat-square&logo=github" alt="GitHub" />
-    <img src="https://img.shields.io/badge/networks-Solana%20%7C%20Base%20%7C%20BSC-14F195?style=flat-square" alt="Networks" />
     <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License" />
   </p>
 
-  <p><strong>In Code We Trust, On GitHub We Launch.</strong></p>
+  <p><strong>Launch tokens on Pump.fun, Bags.fm, Clanker, and Four.meme directly from a GitHub issue, pull request, or discussion comment.</strong></p>
 </div>
 
 ---
 
-GitPump is a GitHub-native interface for launching tokens across multiple chains.
-Instead of random, manual launches, GitPump enables structured, command-based execution directly from GitHub.
+GitPump is a GitHub-native token launchpad. Post a `/launch` command in any GitHub issue, pull request comment, or discussion, attach a logo image, and the bot handles everything — wallet management, IPFS upload, on-chain transaction, and confirmation reply.
 
----
-
-## What is GitPump?
-
-GitPump is a developer-first layer that allows token launches via GitHub interactions such as issues and comments — across Solana, Base, and BSC.
-
-By introducing structure and traceable workflows, GitPump helps:
-
-- Developers launch more responsibly
-- Reduce random and misleading tokens
-- Create a safer experience for buyers
-
----
-
-## Install the Bot
-
-**[→ Install GitPump on your repository](https://github.com/apps/gitpump-bot)**
-
-Once installed, the bot will listen for `/launch` and `/claim` commands in any issue comment on your repo.
+It works across four platforms on three blockchains: **Pump.fun** and **Bags.fm** on Solana, **Clanker** on Base, and **Four.meme** on BSC.
 
 ---
 
 ## How It Works
 
-A simple GitHub comment becomes a real token launch.
-
 ```
-/launch name=YourToken symbol=TICKER description=Your description platform=pumpfun
+/launch name=YourToken symbol=TICKER platform=pumpfun
+description=Your token description here
+twitter=https://x.com/yourhandle
+telegram=https://t.me/yourchannel
+website=https://yoursite.com
 ```
 
-1. Install GitPump on your repo (see above)
-2. Post a `/launch` command with your token details and attach a logo image
-3. The GitPump bot validates input, uploads your logo to IPFS, and deploys on your chosen platform
-4. Bot replies with the contract address and a direct link
+Attach your token logo image to the comment. That's it.
+
+1. Post a `/launch` comment on any issue, PR, or discussion in a repo with GitPump installed
+2. GitPump verifies the signature, checks rate limits and account age, parses the command
+3. The bot downloads your logo, uploads it to IPFS (for Solana platforms), and executes the on-chain launch
+4. A reply is posted with the contract address and a direct link to the token on its launchpad
+5. The launch appears instantly on the public live feed at [gitpump.com](https://gitpump.com)
 
 ---
 
 ## Supported Platforms
 
-| platform= | Platform | Network |
-|---|---|---|
-| `pumpfun` | pump.fun | Solana |
-| `bags` | bags.fm | Solana |
-| `clanker` | clanker.world | Base |
-| `fourmeme` | four.meme | BSC |
+| Platform | Blockchain | Command value | Symbol limit |
+|---|---|---|---|
+| Pump.fun | Solana mainnet | `platform=pumpfun` | 10 chars |
+| Bags.fm | Solana mainnet | `platform=bags` | 9 chars |
+| Clanker | Base (ETH L2) | `platform=clanker` | 10 chars |
+| Four.meme | BSC (BNB Chain) | `platform=fourmeme` | 10 chars |
+
+You can also use `chain=` as an alias for `platform=`.
 
 ---
 
@@ -75,187 +65,124 @@ sequenceDiagram
     participant GH as GitHub
     participant Bot as GitPump Bot
     participant IPFS as IPFS
-    participant Chain as Platform (pump.fun / bags / clanker / four.meme)
+    participant Chain as Blockchain
 
-    Dev->>GH: Post /launch comment + attach logo
-    GH->>Bot: Webhook event (issue_comment)
-    Bot->>Bot: Verify GitHub signature
+    Dev->>GH: Post /launch comment + attach logo (issue, PR, or discussion)
+    GH->>Bot: Webhook event (issue_comment or discussion_comment)
+    Bot->>Bot: Verify HMAC-SHA256 signature
     Bot->>Bot: Parse /launch command
-    Bot->>Bot: Rate limit check (1h per user)
+    Bot->>Bot: Rate limit + account age check (14 days min)
     Bot->>GH: Download attached logo
     GH-->>Bot: Logo image
-    Bot->>IPFS: Upload logo + metadata
+    Bot->>IPFS: Upload logo + metadata (Solana platforms)
     IPFS-->>Bot: IPFS URI
-    Bot->>Chain: Deploy token via fresh wallet
-    Chain-->>Bot: Contract address
-    Bot->>GH: Reply with result + platform link
+    Bot->>Chain: Launch token on selected platform
+    Chain-->>Bot: Contract address + tx hash
+    Bot->>GH: Reply with result + launchpad link
 ```
 
 ---
 
-## Fee Claiming
+## Where You Can Use It
 
-Every launch uses a fresh wallet as the token creator. Trading fees accumulate there automatically.
+GitPump responds to `/launch` commands in:
 
-To claim your fees, comment on any issue:
+- **Issues** — standard GitHub issue comments
+- **Pull Requests** — comments on the PR conversation thread
+- **Discussions** — comments in GitHub Discussions (requires `discussion_comment` webhook event subscription)
+
+---
+
+## Rules
+
+- One launch per GitHub account per hour
+- GitHub account must be at least 14 days old
+- Logo image is required (PNG, JPG, GIF, WEBP — max 15 MB)
+- Description is required
+- Token name and symbol are permanent once launched
+
+---
+
+## Commands
+
+### /launch
 
 ```
-/claim <your_wallet_address>
+/launch name=YourToken symbol=TICKER platform=pumpfun
+description=A short token description (max 200 chars)
+twitter=https://x.com/yourhandle
+telegram=https://t.me/yourchannel
+website=https://yoursite.com
 ```
 
-**75% goes to you · 25% goes to GitPump** (after deducting operational costs)
-
----
-
-## Why GitPump?
-
-Launching tokens is often:
-
-- Random
-- Unstructured
-- Anonymous
-- Easy to abuse
-
-GitPump introduces:
-
-- Structured workflows
-- Developer accountability
-- Multi-chain flexibility
-- Transparent execution
-
----
-
-## Built for Responsible Developers
-
-GitPump is designed for developers who understand the impact of launching tokens.
-
-- No blind launches
-- No spam deployment
-- No anonymous chaos
-
-Every launch is tied to a GitHub identity.
-
----
-
-## Core Principles
-
-**1. Structure over randomness**
-Launches should follow a clear process, not impulsive clicks.
-
-**2. Developer accountability**
-Actions are tied to GitHub identities, not anonymous wallets.
-
-**3. Buyer protection**
-Reducing misleading or low-effort tokens improves trust.
-
-**4. Minimal friction, maximum clarity**
-Simple commands, powerful outcomes.
-
----
-
-## Example Command
+### /claim
 
 ```
-/launch
-name=MyToken
-symbol=MTK
-description=Example token
-platform=pumpfun
-twitter=https://x.com/example
-telegram=https://t.me/example
-website=https://example.com
+/claim 0xYourWalletAddress
 ```
 
-Attach your token logo image directly to the GitHub comment.
+Sweeps accumulated creator fees from Clanker (Base) and Four.meme (BSC) launches to your wallet. 75% to you, 25% to GitPump.
+
+### /point
+
+```
+/point
+```
+
+Displays your GitPump Points balance. Points are earned from trading volume on your launched tokens and can be redeemed for GitPump rewards and airdrop allocation.
 
 ---
 
-## Architecture Overview
+## Architecture
 
 | Layer | Component | Role |
 |---|---|---|
-| Entry | GitHub Issue / Comment | User posts `/launch` command |
-| Gateway | GitPump Bot (Express) | Receives webhook, verifies signature |
-| Processing | Command Parser | Extracts and validates launch params |
-| Storage | IPFS (nft.storage) | Stores logo and metadata |
-| Execution | Fresh Wallet + Platform API | Deploys token on-chain |
-| Database | PostgreSQL + Drizzle ORM | Stores launch history and wallets |
-| Frontend | React + Vite (gitpump.com) | Live launch feed |
+| Entry | GitHub issue / PR / Discussion | User posts `/launch` command |
+| Gateway | GitPump Bot (Express + TypeScript) | Receives webhook, verifies HMAC-SHA256 signature |
+| Processing | Command Parser | Extracts and validates launch parameters |
+| Storage | IPFS | Stores logo and metadata (Solana platforms) |
+| Execution | Pump.fun, Bags.fm, Clanker, Four.meme APIs | Deploys token on-chain |
+| Database | PostgreSQL + Drizzle ORM | Stores launch history and user points |
+| Frontend | React + Vite (gitpump.com) | Live launch feed and docs |
 
 ---
 
-## Components
+## Installation (GitHub App)
 
-| Component | Description |
-|---|---|
-| GitHub Interface | Issues and comments as the command layer |
-| GitPump Bot | Listens and executes commands |
-| Parser Engine | Extracts structured input from comments |
-| Validation Layer | Ensures correctness before execution |
-| Execution Layer | Integrates with pump.fun, bags.fm, clanker, four.meme |
-| IPFS Storage | Handles assets (logo, metadata) |
-| Fee Claimer | Splits trading fees between creator and GitPump |
+1. Visit [github.com/apps/gitpump-bot](https://github.com/apps/gitpump-bot)
+2. Click **Install** and select your repository
+3. Post a `/launch` comment — the bot responds within seconds
 
 ---
 
-## Repositories
+## Self-Hosting
 
-| Repo | Description |
-|---|---|
-| `app` | Web dashboard and launch explorer |
-| `api` | Backend services and bot execution |
-| `docs` | Documentation and guides |
+The full stack is open source. You can run your own instance with your own wallets.
 
----
+| Package | Path | Description |
+|---|---|---|
+| `@workspace/api-server` | `artifacts/api-server` | Express bot + webhook handlers |
+| `@workspace/landing` | `artifacts/landing` | React + Vite frontend (gitpump.com) |
+| `@workspace/db` | `lib/db` | Drizzle ORM schema + migrations |
 
-## Vision
-
-GitPump aims to redefine how tokens are launched.
-
-**From:** Fast, anonymous, and chaotic
-
-**To:** Structured, intentional, and developer-driven
+Required environment variables: `GITHUB_TOKEN`, `GITHUB_WEBHOOK_SECRET`, `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_APP_WEBHOOK_SECRET`, `DATABASE_URL`, and platform-specific wallet keys.
 
 ---
 
-## Trust & Safety
+## Points System
 
-GitPump does not eliminate risk, but it improves:
+Every launch earns GitPump Points:
 
-- Transparency
-- Accountability
-- Signal vs noise ratio
+- Install the GitHub App: **+100 bonus points**
+- $1,000 in trading volume on your token: **+1 point**
+- Check balance anytime: comment `/point` on any issue, PR, or discussion
 
----
-
-## Status
-
-- Actively in development
-- Multi-chain support: Solana, Base, BSC
-- Iterating on launch flow and fee claiming
-
----
-
-## Contributing
-
-We welcome developers who believe in:
-
-- Responsible token creation
-- Better on-chain experiences
-- Reducing noise in crypto ecosystems
-
----
-
-## Join the Movement
-
-GitPump is not about launching faster.
-
-It's about launching better.
+Points convert to GitPump Token rewards at launch.
 
 ---
 
 <div align="center">
-  <a href="https://github.com/apps/gitpump-bot">Install the Bot</a> &nbsp;|&nbsp;
   <a href="https://gitpump.com">gitpump.com</a> &nbsp;|&nbsp;
-  <a href="https://github.com/git-pump/gitpump/issues">Launch Now</a>
+  <a href="https://github.com/apps/gitpump-bot">Install the Bot</a> &nbsp;|&nbsp;
+  <a href="https://gitpump.com/docs">Documentation</a>
 </div>
